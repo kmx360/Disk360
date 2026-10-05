@@ -1,0 +1,16 @@
+add_library(diskio)
+
+target_sources(diskio PRIVATE partio.cpp)
+target_include_directories(diskio PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+if(LINUX)
+	target_sources(diskio PRIVATE diskio_linux.cpp)
+	find_package(PkgConfig REQUIRED)
+	pkg_check_modules(libudev REQUIRED IMPORTED_TARGET libudev)
+	target_link_libraries(diskio PRIVATE PkgConfig::libudev)
+elseif(WIN32)
+	target_sources(diskio PRIVATE diskio_win32.cpp)
+	target_link_libraries(diskio PRIVATE setupapi)
+else()
+	message(FATAL_ERROR "Operating system not supported")
+endif()
